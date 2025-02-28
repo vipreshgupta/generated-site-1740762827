@@ -1,0 +1,490 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Mini-Game Universe</title>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #0d1117;
+            color: #fff;
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
+        }
+
+        /* Container for the entire game lobby */
+        .game-lobby {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* Individual game card */
+        .game-card {
+            background-color: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            overflow: hidden; /* Ensure content doesn't overflow */
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .game-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .game-card h3 {
+            color: #00ffff;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .game-card p {
+            color: #c9d1d9;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #161b22;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 80%;
+            max-height: 80%;
+            overflow: auto;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 255, 255, 0.2);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #00ffff;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Game Specific Styles */
+        /* Ludo */
+        #ludo-board {
+            width: 400px;
+            height: 400px;
+            background-color: #fff; /* Placeholder */
+            margin: 20px auto;
+            border: 2px solid #30363d;
+            border-radius: 10px;
+        }
+
+        /* Minesweeper */
+        #minesweeper-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 30px); /* Example 10x10 grid */
+            gap: 2px;
+            margin: 20px auto;
+        }
+
+        .ms-cell {
+            width: 30px;
+            height: 30px;
+            background-color: #30363d;
+            border: 1px solid #161b22;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .ms-cell.revealed {
+            background-color: #c9d1d9;
+            color: #0d1117;
+        }
+
+        .ms-cell.mine {
+            background-color: red;
+        }
+
+        /* Tic-Tac-Toe */
+        #tictactoe-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+            background-color: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 10px;
+        }
+
+        .ttt-cell {
+            width: 100px;
+            height: 100px;
+            background-color: #30363d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .ttt-cell:hover {
+            background-color: #444c56;
+        }
+
+        /* Chess */
+        #chess-board {
+            width: 400px;
+            height: 400px;
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            border: 2px solid #30363d;
+            margin: 20px auto;
+        }
+
+        .chess-square {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+
+        .chess-square.light {
+            background-color: #f0d9b5;
+        }
+
+        .chess-square.dark {
+            background-color: #b58863;
+        }
+
+        /* Card Games Placeholder */
+        #card-games-area {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #161b22;
+            padding: 10px 0;
+            text-align: center;
+            border-bottom: 2px solid #30363d;
+        }
+
+        header h1 {
+            color: #00ffff;
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #161b22;
+            padding: 10px 0;
+            text-align: center;
+            border-top: 2px solid #30363d;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        footer p {
+            color: #c9d1d9;
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .game-lobby {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .game-card h3 {
+                font-size: 1.2em;
+            }
+
+            .game-card p {
+                font-size: 0.9em;
+            }
+
+            #ludo-board, #chess-board {
+                width: 90%;
+                height: auto;
+            }
+
+            #minesweeper-grid {
+                grid-template-columns: repeat(auto-fit, minmax(25px, 1fr));
+            }
+
+            .ms-cell {
+                width: 25px;
+                height: 25px;
+                font-size: 16px;
+            }
+
+            #tictactoe-board {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+            }
+            .ttt-cell{
+                width: auto;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ultimate Mini-Game Universe</h1>
+    </header>
+
+    <div class="game-lobby">
+        <!-- Ludo Mania Card -->
+        <div class="game-card" onclick="openModal('ludo')">
+            <img src="https://picsum.photos/200/150?random=1" alt="Ludo Mania">
+            <h3>Ludo Mania</h3>
+            <p>Roll the dice and race your opponents in this classic board game!</p>
+        </div>
+
+        <!-- Minesweeper Mayhem Card -->
+        <div class="game-card" onclick="openModal('minesweeper')">
+            <img src="https://picsum.photos/200/150?random=2" alt="Minesweeper Mayhem">
+            <h3>Minesweeper Mayhem</h3>
+            <p>Uncover the hidden mines and challenge your strategic skills!</p>
+        </div>
+
+        <!-- Tic-Tac-Toe Evolution Card -->
+        <div class="game-card" onclick="openModal('tictactoe')">
+            <img src="https://picsum.photos/200/150?random=3" alt="Tic-Tac-Toe Evolution">
+            <h3>Tic-Tac-Toe Evolution</h3>
+            <p>Experience the classic game with exciting new twists and challenges!</p>
+        </div>
+
+        <!-- Chess Royale Card -->
+        <div class="game-card" onclick="openModal('chess')">
+            <img src="https://picsum.photos/200/150?random=4" alt="Chess Royale">
+            <h3>Chess Royale</h3>
+            <p>Engage in strategic battles and outsmart your opponents in this timeless game!</p>
+        </div>
+
+        <!-- Card Games & More Card -->
+        <div class="game-card" onclick="openModal('cardgames')">
+            <img src="https://picsum.photos/200/150?random=5" alt="Card Games & More">
+            <h3>Card Games & More</h3>
+            <p>Explore a variety of classic card games, from Solitaire to Blackjack!</p>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="ludo" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('ludo')">&times;</span>
+            <h2>Ludo Mania</h2>
+            <div id="ludo-board"></div>
+            <!-- Ludo game content will be added here -->
+        </div>
+    </div>
+
+    <div id="minesweeper" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('minesweeper')">&times;</span>
+            <h2>Minesweeper Mayhem</h2>
+            <div id="minesweeper-grid"></div>
+            <!-- Minesweeper game content will be added here -->
+        </div>
+    </div>
+
+    <div id="tictactoe" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('tictactoe')">&times;</span>
+            <h2>Tic-Tac-Toe Evolution</h2>
+            <div id="tictactoe-board"></div>
+            <!-- Tic-Tac-Toe game content will be added here -->
+        </div>
+    </div>
+
+    <div id="chess" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('chess')">&times;</span>
+            <h2>Chess Royale</h2>
+            <div id="chess-board"></div>
+            <!-- Chess game content will be added here -->
+        </div>
+    </div>
+
+    <div id="cardgames" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('cardgames')">&times;</span>
+            <h2>Card Games & More</h2>
+            <div id="card-games-area">
+                <p>Coming Soon: Solitaire, Blackjack, and more!</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Ultimate Mini-Game Universe. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Function to open a modal
+        function openModal(gameId) {
+            document.getElementById(gameId).style.display = 'flex';
+            initializeGame(gameId);
+        }
+
+        // Function to close a modal
+        function closeModal(gameId) {
+            document.getElementById(gameId).style.display = 'none';
+            // Optionally clear game state here if needed
+        }
+
+        // Function to initialize games
+        function initializeGame(gameId) {
+            switch (gameId) {
+                case 'ludo':
+                    initializeLudo();
+                    break;
+                case 'minesweeper':
+                    initializeMinesweeper();
+                    break;
+                case 'tictactoe':
+                    initializeTicTacToe();
+                    break;
+                case 'chess':
+                    initializeChess();
+                    break;
+                // Add cases for other games as needed
+            }
+        }
+
+        // Ludo Initialization
+        function initializeLudo() {
+            const board = document.getElementById('ludo-board');
+            board.innerHTML = '<p>Ludo game coming soon!</p>'; // Placeholder
+        }
+
+        // Minesweeper Initialization
+        function initializeMinesweeper() {
+            const grid = document.getElementById('minesweeper-grid');
+            grid.innerHTML = ''; // Clear previous content
+            for (let i = 0; i < 100; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('ms-cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleMinesweeperClick);
+                grid.appendChild(cell);
+            }
+        }
+
+        function handleMinesweeperClick(event) {
+            const cell = event.target;
+            const index = cell.dataset.index;
+            // Placeholder logic: reveal cell and check for mine
+            cell.classList.add('revealed');
+            if (Math.random() < 0.2) { // 20% chance of being a mine
+                cell.classList.add('mine');
+                cell.textContent = '💣';
+            } else {
+                cell.textContent = Math.floor(Math.random() * 5); // Placeholder for adjacent mines
+            }
+        }
+
+        // Tic-Tac-Toe Initialization
+        function initializeTicTacToe() {
+            const board = document.getElementById('tictactoe-board');
+            board.innerHTML = ''; // Clear previous content
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('ttt-cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleTicTacToeClick);
+                board.appendChild(cell);
+            }
+        }
+
+        let currentPlayer = 'X'; // Start with player X
+
+        function handleTicTacToeClick(event) {
+            const cell = event.target;
+            if (!cell.textContent) { // Check if cell is empty
+                cell.textContent = currentPlayer;
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // Switch player
+            }
+        }
+
+        // Chess Initialization
+        function initializeChess() {
+            const board = document.getElementById('chess-board');
+            board.innerHTML = ''; // Clear previous content
+            const boardSetup = [
+                ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+                ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+                ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+            ];
+
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    const square = document.createElement('div');
+                    square.classList.add('chess-square');
+                    square.classList.add((i + j) % 2 === 0 ? 'light' : 'dark');
+                    square.textContent = boardSetup[i][j];
+                    board.appendChild(square);
+                }
+            }
+        }
+
+        // Prevent scrolling when modal is open (optional, but good for UX)
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
